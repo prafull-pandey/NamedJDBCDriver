@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,13 +14,14 @@ public class NamedPreparedStatement {
 
 	private PreparedStatement preparedStatement;
 	private Connection connection;
-	private Map indexMap;
+	private Map<String,List<Integer>> indexListMap;
+	private Map<String,int[]> indexMap;
 
 	public NamedPreparedStatement(Connection connection, String query) throws SQLException {
 		this.connection=connection;
-		indexMap=new HashMap();
+		indexListMap=new HashMap<>();
 		String parsedQuery=createSqlQuery(query);
-		this.preparedStatement=connection.prepareStatement(parsedQuery);
+		this.preparedStatement=this.connection.prepareStatement(parsedQuery);
 	}
 
 	private String createSqlQuery(String query) {
@@ -55,10 +55,10 @@ public class NamedPreparedStatement {
 					ch='?';
 					i+=name.length();
 
-					List indexList=(List)indexMap.get(name);
+					List<Integer> indexList=(List<Integer>)indexListMap.get(name);
 					if(indexList==null) {
-						indexList=new LinkedList();
-						indexMap.put(name, indexList);
+						indexList=new LinkedList<Integer>();
+						indexListMap.put(name, indexList);
 					}
 					indexList.add(new Integer(index));
 					index++;
@@ -66,17 +66,11 @@ public class NamedPreparedStatement {
 			}
 			sqlQuery.append(ch);
 		}
-		for(Iterator itr=indexMap.entrySet().iterator(); itr.hasNext();) {
-			Map.Entry entry=(Map.Entry)itr.next();
-			List list=(List)entry.getValue();
-			int[] indexes=new int[list.size()];
-			int i=0;
-			for(Iterator itr2=list.iterator(); itr2.hasNext();) {
-				Integer x=(Integer)itr2.next();
-				indexes[i++]=x.intValue();
+		
+		for (Map.Entry<String,List<Integer>> entry : indexListMap.entrySet())  {
+			int[] indexes=entry.getValue().stream().mapToInt(k->k).toArray();
+			indexMap.put(entry.getKey(), indexes);
 			}
-			entry.setValue(indexes);
-		}
 
 		return sqlQuery.toString();
 	}
