@@ -32,6 +32,7 @@ public class NamedPreparedStatement {
 		int index=1;
 		int x=0;
 		String y= "prafull";
+		String z="This is my added code";
 
 		for(int i=0;i<length;i++) {
 			char ch =query.charAt(i);
