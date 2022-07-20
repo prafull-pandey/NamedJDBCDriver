@@ -30,6 +30,7 @@ public class NamedPreparedStatement {
 		boolean inSingleQuote=false;
 		boolean inDoubleQuote=false;
 		int index=1;
+		int x=0;
 
 		for(int i=0;i<length;i++) {
 			char ch =query.charAt(i);
