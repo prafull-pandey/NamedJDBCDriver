@@ -31,6 +31,7 @@ public class NamedPreparedStatement {
 		boolean inDoubleQuote=false;
 		int index=1;
 		int x=0;
+		String y= "prafull";
 
 		for(int i=0;i<length;i++) {
 			char ch =query.charAt(i);
